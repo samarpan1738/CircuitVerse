@@ -9,7 +9,7 @@
 ## Versions
 
 - Ruby Version: ruby-2.6.5
-- Rails Version: Rails 5.1.6
+- Rails Version: Rails 6.0.1
 - PostgreSQL Version: 9.5
 
 ## Cloning Instructions
@@ -31,11 +31,22 @@ Please go through the [Contribution Guidelines](CONTRIBUTING.md) before going fo
 **Note:** You might want to use the docker instructions if you do not want to setup your own environment.
 
 * Install ruby using RVM, use ruby-2.6.5
-* Install Dependencies: `bundle install `
+* Install bundler : `gem install bundler`
+* Install Dependencies: `bundle install`
 * Configure your DB in config/database.yml, copy config/database.example.yml (Note : check for postgres password and update it in place of "postgres")
 * Create database: `rails db:create`
 * Run Migrations: `rails db:migrate`
 * At this point, local development can be started with ```rails s -b 127.0.0.1 -p 8080```
+
+### Additional setup instructions
+[Yarn](https://yarnpkg.com/lang/en/) is a package manager for the JavaScript ecosystem.
+CircuitVerse uses Yarn for frontend package and asset management.
+
+If you encounter the following error,
+```
+Error: File to import not found or unreadable: bootstrap/scss/bootstrap.scss
+```
+run `yarn` to install frontend dependencies
 
 Additional software:
 * Install imagemagick
@@ -46,6 +57,8 @@ Additional software:
 
 Ensure all tests are passing locally before making a pull request. To run tests -
 * `bundle exec rspec` or `bin/rake spec:all`
+
+**Note:** To pass Systems Tests you need [Chrome Browser](https://www.google.com/chrome/browser/desktop/index.html) installed
 
 ## Docker Instructions
 
@@ -65,6 +78,12 @@ You can use gitpod to develop CircuitVerse in the cloud by following the steps m
 
 Pull Requests can be created by following these [Steps](https://github.com/CircuitVerse/CircuitVerse/wiki/Pull-Requests-using-Gitpod)
 
+## Adding Environment Variables
+* Make the following changes in your Google, Facebook, Github app:
+1.  If you are running the application locally, update the site url field with ``http://localhost:8080`` and callback url field with ``http://localhost:3000/users/auth/(google or facebook or github)/callback``.
+2.  If you are running the application in gitpod, update the site url field with ``gitpod url`` and callback url field with ```gitpod url/users/auth/(google or facebook or github)/callback``.
+* Configure your env in .env, copy .env.example ( Note: check for the ``id`` and ``secret`` in your Google, Facebook, Github app and update it in its respective place. )
+* After adding environment variables run ``dotenv rails server`` to start the application.
 ## Developer Instructions
 Developers can quickly get started by setting up the dev environment using the instructions above. To seed the database with some sample data, run 'bundle exec rake db:seed'. The admin credentials after seeding will be as follows:
 ```

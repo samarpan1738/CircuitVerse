@@ -1,5 +1,7 @@
 class Project < ApplicationRecord
   require "pg_search"
+  require "custom_optional_targets/web_push"
+  validates :name, length: { minimum: 1 }
   belongs_to :author, class_name: 'User'
   has_many :forks , class_name: 'Project', foreign_key: 'forked_project_id', dependent: :nullify
   belongs_to :forked_project , class_name: 'Project' , optional: true
@@ -46,30 +48,6 @@ class Project < ApplicationRecord
   # after_commit :send_mail, on: :create
 
   scope :open, -> { where(project_access_type: "Public") }
-  def check_edit_access(user)
-    @user_access =
-        ((!user.nil? and self.author_id == user.id and self.project_submission != true) \
-        or (!user.nil? and Collaboration.find_by(project_id:self.id,user_id:user.id)))
-
-  end
-
-  def check_view_access(user)
-    @user_access =
-        (self.project_access_type != "Private" \
-        or (!user.nil? and self.author_id==user.id) \
-        or (!user.nil? and !self.assignment_id.nil? and self.assignment.group.mentor_id==user.id) \
-        or (!user.nil? and Collaboration.find_by(project_id:self.id,user_id:user.id)) \
-        or (!user.nil? and user.admin))
-  end
-
-
-  def check_direct_view_access(user)
-    @user_access =
-        (self.project_access_type == "Public" or \
-        (self.project_submission == false and  !user.nil? and self.author_id==user.id) or \
-        (!user.nil? and Collaboration.find_by(project_id:self.id,user_id:user.id)) or \
-        (!user.nil? and user.admin))
-  end
 
   def increase_views(user)
 
@@ -93,6 +71,24 @@ class Project < ApplicationRecord
     end
   end
 
+  acts_as_notifiable :users,
+                     # Notification targets as :targets is a necessary option
+                     targets: ->(project, key) {
+                       [project.forked_project.author]
+                     },
+                     notifier: :author,
+                     printable_name: ->(project) {
+                       "forked your project \"#{project.name}\""
+                     },
+                     notifiable_path: :project_notifiable_path,
+                     optional_targets: {
+                         CustomOptionalTarget::WebPush => {}
+                     }
+
+  def project_notifiable_path
+    user_project_path(self.forked_project.author, self.forked_project)
+  end
+
   def self.tagged_with(name)
     Tag.find_by!(name: name).projects
   end
@@ -112,11 +108,21 @@ class Project < ApplicationRecord
   end
 
   validate :check_validity
+  validate :clean_description
   private
   def check_validity
     if project_access_type != "Private" and !assignment_id.nil?
       errors.add(:project_access_type, "Assignment has to be private")
     end
+  end
+
+  def clean_description
+    profanity_filter = LanguageFilter::Filter.new matchlist: :profanity
+    return nil unless profanity_filter.match? description
+    errors.add(
+      :description,
+      "contains inappropriate language: #{profanity_filter.matched(description).join(', ')}"
+    )
   end
 
   def check_and_remove_featured

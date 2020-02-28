@@ -1,0 +1,60 @@
+// All the custom class styles
+.noprojects {
+  left: 30%;
+  position: absolute;
+  top: 30%;
+}
+
+.simulator {
+  border: 2px solid $green;
+  font-weight: 500;
+  &:hover {
+    color: $color-hover;
+    background: $active-background;
+  }
+}
+
+.logo {
+  height: 25px;
+}
+
+.navbar-light .navbar-nav {
+  .nav-item {
+    .nav-link {
+      color: $primary;
+      font-weight: 500;
+    }
+
+    &.active {
+      border-bottom: 2px solid $green;
+    }
+  }
+}
+
+.empty-div {
+  height: 250px;
+}
+
+.footer-logo {
+  width: 80%;
+}
+
+.footer-social-icon {
+  width: 32px;
+}
+
+.footer-social {
+  margin-bottom: unset;
+}
+
+.copyright {
+  font-size: small;
+  overflow: visible;
+  white-space: nowrap;
+}
+
+.favblank {
+  left: 40%;
+  position: absolute;
+  top: 35%;
+}

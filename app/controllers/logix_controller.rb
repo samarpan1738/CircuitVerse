@@ -27,13 +27,7 @@ class LogixController < ApplicationController
   def features
   end
 
-  def about
-  end
-
   def all_user_index
-  end
-
-  def privacy
   end
 
   def tos

@@ -9,7 +9,7 @@ class User < ApplicationRecord
   has_many :rated_projects,   through: :stars, dependent: :destroy, source: "project"
   has_many :groups_mentored, class_name: "Group",  foreign_key: "mentor_id", dependent: :destroy
   devise :database_authenticatable, :registerable, :recoverable, :rememberable, :trackable,
-    :validatable, :omniauthable, omniauth_providers: [:google_oauth2, :facebook]
+    :validatable, :omniauthable, omniauth_providers: [:google_oauth2, :facebook, :github]
 
   # has_many :assignments, foreign_key: 'mentor_id', dependent: :destroy
   has_many :group_members, dependent: :destroy
@@ -21,6 +21,9 @@ class User < ApplicationRecord
   has_many :collaborated_projects, source: "project", through: :collaborations
 
   has_many :pending_invitations, foreign_key: :email, primary_key: :email
+
+  # Multiple push_subscriptions over many devices
+  has_many :push_subscriptions, dependent: :destroy
 
   after_commit :send_welcome_mail,  on: :create
   after_commit :create_members_from_invitations, on: :create
@@ -39,6 +42,8 @@ class User < ApplicationRecord
     text :country
   end
 
+  acts_as_target printable_name: :name, email: :email
+  acts_as_notifier printable_name: :name
 
   def create_members_from_invitations
     pending_invitations.reload.each do |invitation|
@@ -60,6 +65,16 @@ class User < ApplicationRecord
       )
     end
     user
+  end
+
+  def send_push_notification(message, url = "")
+    self.push_subscriptions.each do |subscription|
+      subscription.send_push_notification(message, url)
+    rescue Webpush::Unauthorized
+      # Expired subscription, maybe user cleared browser data or revoked
+      # notification permission
+      self.push_subscriptions.destroy(subscription)
+    end
   end
 
   private
