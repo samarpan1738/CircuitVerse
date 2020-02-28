@@ -24,8 +24,13 @@
 
         <div class="form-group">
           <label for="profile_picture">Profile Picture:</label>
+<<<<<<< HEAD
           <p> <%= image_tag @profile.profile_picture.url(:thumb) , :id => "pp" %></p>
           <input type="file" class="form-control" id="profile_picture" name="user[profile_picture]" value="<%= @profile.profile_picture %>"    
+=======
+          <p> <%= image_tag @profile.profile_picture.url(:thumb) %></p>
+          <input type="file" class="form-control" id="profile_picture" name="user[profile_picture]" value="<%= @profile.profile_picture %>">
+>>>>>>> parent of ea3faa1... Confused
         </div>
         
 
@@ -60,10 +65,4 @@
         displayKey: 'name',
         source: bloodhound.ttAdapter()
     });
-    let remove=()=>
-    {
-        let pp=document.getElementById('pp');
-        console.log(pp)
-        pp.src="/home/samar1738/Documents/CircuitVerse/app/assets/images/thumb/Default.jpg";
-    }
 </script>
