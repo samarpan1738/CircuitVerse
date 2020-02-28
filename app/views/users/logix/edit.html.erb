@@ -25,13 +25,9 @@
         <div class="form-group">
           <label for="profile_picture">Profile Picture:</label>
           <p> <%= image_tag @profile.profile_picture.url(:thumb) , :id => "pp" %></p>
-          <input type="file" class="form-control" id="profile_picture" name="user[profile_picture]" value="<%= @profile.profile_picture %>"
-          
+          <input type="file" class="form-control" id="profile_picture" name="user[profile_picture]" value="<%= @profile.profile_picture %>"    
         </div>
-        <div>
-          <button type="button" name="btn" id="remove" onclick="remove()">remove pic
-        </button>
-        </div>
+        
 
         <div class="field form-group">
           <label for="profile_subscribed">Subscribed to mails: </label>
